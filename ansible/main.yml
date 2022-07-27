@@ -1,0 +1,45 @@
+---
+- name: Install and configure load balancer servers
+  hosts: load_balancer_servers
+  become: true
+  roles:
+    - load_balancer
+
+- name: Install and configure mysql server
+  hosts: db_server
+  become: true
+  roles:
+    - mariadb
+
+- name: Install and configure iscsi-target
+  become: true
+  hosts: iscsi
+  roles:
+    - iscsi-target
+
+
+- name: Install and configure iscsi-clients
+  hosts: web_servers
+  become: true
+  roles:
+    - pacemaker
+    - iscsi-client
+
+- name: Configure GFS2
+  become: true
+  hosts: web-0
+  roles:
+    - config-gfs2
+
+- name: Install and configure web servers
+  become: true
+  hosts: web_servers
+  roles:
+    - web
+
+- name: Install WordPress and tune cluster
+  become: true
+  hosts: web-0
+  roles:
+    - wp
+    - tune-cluster

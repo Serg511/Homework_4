@@ -1,0 +1,24 @@
+- name: Install packages
+  yum: 
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - epel-release
+    - mariadb
+    - mariadb-server
+
+- name: Enable mariadb
+  systemd:
+    name: mariadb
+    enabled: yes
+    state: started
+
+- name: Configure mysql
+  become: true
+  shell: mysql -e "{{ item }}"
+  with_items:
+    - "CREATE DATABASE wordpress;"
+    - "CREATE USER 'wordpressuser'@'%' IDENTIFIED BY 'password';"
+    - "GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'%' IDENTIFIED BY 'password';"
+    - "FLUSH PRIVILEGES;"
